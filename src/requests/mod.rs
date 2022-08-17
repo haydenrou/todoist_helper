@@ -6,10 +6,16 @@ use std::collections::HashMap;
 
 mod auth;
 
+
+pub enum RequestResponse {
+    Single(Todo),
+    Multiple(Vec<Todo>)
+}
+
 // static PROJECTS_URL: &str = "https://api.todoist.com/rest/v1/projects";
 static TASKS_URL: &str = "https://api.todoist.com/rest/v1/tasks";
 
-pub async fn add_todo(initial_values: PostTodo) -> Result<Todo, reqwest::Error> {
+pub async fn add_todo(initial_values: PostTodo) -> Result<RequestResponse, reqwest::Error> {
     let auth_key: &str = &("Bearer ".to_owned() + &auth::todoist_token().to_owned());
 
     let request_url = format!("{}", TASKS_URL);
@@ -32,11 +38,11 @@ pub async fn add_todo(initial_values: PostTodo) -> Result<Todo, reqwest::Error> 
 
     let result = serde_json::from_str::<Todo>(&response).expect("No Todo found");
 
-    Ok(result)
+    Ok(RequestResponse::Single(result))
 }
 
 // today or overdue
-pub async fn show_tasks(date_string: String) -> Result<Vec<Todo>, reqwest::Error> {
+pub async fn show_tasks(date_string: String) -> Result<RequestResponse, reqwest::Error> {
     let auth_key: &str = &("Bearer ".to_owned() + &auth::todoist_token().to_owned());
 
     let request_url = format!("{}", TASKS_URL);
@@ -61,5 +67,5 @@ pub async fn show_tasks(date_string: String) -> Result<Vec<Todo>, reqwest::Error
         println!("{}", todo.content)
     };
 
-    Ok(result_set)
+    Ok(RequestResponse::Multiple(result_set))
 }
