@@ -1,7 +1,7 @@
 mod requests;
 mod input;
 
-use crate::requests::{show_tasks, add_todo};
+use crate::requests::{show_todos, add_todo};
 use requests::RequestResponse;
 use tokio::runtime::Runtime;
 use serde::{Deserialize, Serialize};
@@ -11,7 +11,6 @@ use clap::Parser;
 struct Due {
     date: String,
     recurring: bool,
-    lang: String,
     string: String,
 }
 
@@ -61,6 +60,11 @@ struct Cli {
     #[clap(short = 'd', value_name = "DESCRIPTION")]
     description: Option<String>,
 
+    #[clap(short = 'f', value_name = "FILTERS")]
+    filters: Option<String>,
+
+    #[clap(short = 'a', value_name = "ATTRIBUTES")]
+    attributes: Option<String>,
 }
 
 fn main() {
@@ -79,12 +83,20 @@ fn main() {
                     None => "".to_string()
                 }
             }).await,
-            ["show", "today" | "overdue"] => show_tasks(args.target).await,
+            ["show", "todos"] => show_todos(
+                match args.filters {
+                    Some(value) => { value.trim().to_string() },
+                    None => "".to_string()
+                },
+                match args.attributes {
+                    Some(ref values) => { values.split(",").map(|s|s.to_string()).collect() },
+                    None => ["".to_string()].to_vec()
+                }
+            ).await,
             _ => unreachable!()
         };
-        if arg_action.is_ok() {
-            println!("Your task has been successfully created!")
-        } else if arg_action.is_err() {
+
+        if arg_action.is_err() {
             println!("Your task has had an error.")
         };
     });
