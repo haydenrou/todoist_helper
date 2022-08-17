@@ -3,8 +3,7 @@ A simple CLI for adding, updating and viewing TODOs in Todoist
 
 ## Usage
 - `cargo run -- add todo` or with the optional `-c "My new content"` flag
-- `cargo run -- show today`
-- `cargo run -- show overdue`
+- `cargo run -- show todos`
 
 ## Options
 When adding a TODO, you can give the content (`-c`) flag to provide content
