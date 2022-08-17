@@ -4,6 +4,7 @@ A simple CLI for adding, updating and viewing TODOs in Todoist
 ## Usage
 - `cargo run -- add todo` or with the optional `-c "My new content"` flag
 - `cargo run -- show todos`
+- `cargo run -- complete todo 12345`
 
 ## Options
 When adding a TODO, you can give the content (`-c`) flag to provide content
@@ -14,8 +15,11 @@ When showing TODOs, you can add filters with the filters (`-f`) flag, and multip
 When showing TODOs, you can specify the columns you'd like to see as a result with the attribute(s) (`-a`) flag
 - `cargo run -- show todos -a "id,content"`
 
+## Advanced Usage
+If you have [fzf](https://github.com/junegunn/fzf) installed, you can use the following to complete a TODO
+- ``
+
 ## TODO: (I see the irony in this)
 - Add GET for projects
 - Add a way to set a date to a TODO that you're adding (see due_string)
-- Complete a task
-- Stretch goal: run `cargo run -- complete todo` and automatically spit out a list of tasks to FZF that you can complete, then complete one when selected
+- Figure out how to pipe results into fzf then complete

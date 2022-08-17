@@ -1,7 +1,7 @@
 mod requests;
 mod input;
 
-use crate::requests::{show_todos, add_todo};
+use crate::requests::{show_todos, add_todo, complete_todo};
 use requests::RequestResponse;
 use tokio::runtime::Runtime;
 use serde::{Deserialize, Serialize};
@@ -53,6 +53,7 @@ pub struct PostTodo {
 struct Cli {
     action: String,
     target: String,
+    item: Option<u64>,
 
     #[clap(short = 'c', value_name = "CONTENT")]
     content: Option<String>,
@@ -93,6 +94,7 @@ fn main() {
                     None => ["".to_string()].to_vec()
                 }
             ).await,
+            ["complete", "todo"] => complete_todo(args.item).await,
             _ => unreachable!()
         };
 

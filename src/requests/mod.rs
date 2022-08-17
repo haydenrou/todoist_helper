@@ -9,11 +9,12 @@ mod auth;
 
 pub enum RequestResponse {
     Single(Todo),
-    Multiple(Vec<Todo>)
+    Multiple(Vec<Todo>),
+    Empty(())
 }
 
 // static PROJECTS_URL: &str = "https://api.todoist.com/rest/v1/projects";
-static TASKS_URL: &str = "https://api.todoist.com/rest/v1/tasks";
+static TASKS_URL: &str = "https://api.todoist.com/rest/v1/tasks/";
 
 pub async fn add_todo(initial_values: PostTodo) -> Result<RequestResponse, reqwest::Error> {
     let auth_key: &str = &("Bearer ".to_owned() + &auth::todoist_token().to_owned());
@@ -82,4 +83,28 @@ pub async fn show_todos(filter_by: String, attributes_to_collect: Vec<String>) -
     };
 
     Ok(RequestResponse::Multiple(result_set))
+}
+
+pub async fn complete_todo(id: Option<u64>) -> Result<RequestResponse, reqwest::Error> {
+    let auth_key: &str = &("Bearer ".to_owned() + &auth::todoist_token().to_owned());
+    let parsed_id = match id {
+        Some(value) => { value.to_string() },
+        None => "".to_string()
+    };
+
+    let request_url = format!("{}", TASKS_URL.to_owned() + &(parsed_id) + &("/close"));
+
+    let client = reqwest::Client::new();
+
+    client
+        .post(request_url)
+        .header(AUTHORIZATION, auth_key)
+        .send()
+        .await?
+        .text()
+        .await?;
+
+    println!("Your Todo has been successfully completed.");
+
+    Ok(RequestResponse::Empty(()))
 }
