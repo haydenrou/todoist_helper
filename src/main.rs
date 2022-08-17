@@ -1,7 +1,7 @@
 mod requests;
 mod input;
 
-use crate::requests::add_todo;
+use crate::requests::{show_tasks, add_todo};
 use tokio::runtime::Runtime;
 use serde::{Deserialize, Serialize};
 use clap::Parser;
@@ -68,16 +68,17 @@ fn main() {
 
     rt.block_on(async {
         let arg_action = match [&*args.action, &*args.target] {
-            ["add", "todo"] => add_todo(PostTodo {
-                content: match args.content {
-                    Some(value) => { value.trim().to_string() },
-                    None => "".to_string()
-                },
-                description: match args.description {
-                    Some(value) => { value.trim().to_string() },
-                    None => "".to_string()
-                }
-            }).await,
+            // ["add", "todo"] => add_todo(PostTodo {
+            //     content: match args.content {
+            //         Some(value) => { value.trim().to_string() },
+            //         None => "".to_string()
+            //     },
+            //     description: match args.description {
+            //         Some(value) => { value.trim().to_string() },
+            //         None => "".to_string()
+            //     }
+            // }).await,
+            ["show", "today" | "overdue"] => show_tasks(args.target).await,
             _ => unreachable!()
         };
         if arg_action.is_ok() {

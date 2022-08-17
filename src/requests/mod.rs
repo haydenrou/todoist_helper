@@ -2,6 +2,7 @@ use crate::PostTodo;
 use crate::input::get_user_input;
 use crate::Todo;
 use reqwest::header::{AUTHORIZATION, CONTENT_TYPE};
+use std::collections::HashMap;
 
 mod auth;
 
@@ -9,8 +10,9 @@ mod auth;
 static TASKS_URL: &str = "https://api.todoist.com/rest/v1/tasks";
 
 pub async fn add_todo(initial_values: PostTodo) -> Result<Todo, reqwest::Error> {
-    let request_url = format!("{}", TASKS_URL);
     let auth_key: &str = &("Bearer ".to_owned() + &auth::todoist_token().to_owned());
+
+    let request_url = format!("{}", TASKS_URL);
     let data: PostTodo = PostTodo {
         content: if initial_values.content.is_empty() { get_user_input("content".to_string()) } else { initial_values.content },
         description: initial_values.description
@@ -33,3 +35,31 @@ pub async fn add_todo(initial_values: PostTodo) -> Result<Todo, reqwest::Error> 
     Ok(result)
 }
 
+// today or overdue
+pub async fn show_tasks(date_string: String) -> Result<Vec<Todo>, reqwest::Error> {
+    let auth_key: &str = &("Bearer ".to_owned() + &auth::todoist_token().to_owned());
+
+    let request_url = format!("{}", TASKS_URL);
+
+    let client = reqwest::Client::new();
+
+    let mut params = HashMap::new();
+    params.insert("filter", date_string);
+
+    println!("{:?}", params);
+    let response = client
+        .get(request_url)
+        .query(&params)
+        .header(AUTHORIZATION, auth_key)
+        .send()
+        .await?
+        .text()
+        .await?;
+
+    let result_set = serde_json::from_str::<Vec<Todo>>(&response).expect("No Todos found");
+    for todo in &result_set {
+        println!("{}", todo.content)
+    };
+
+    Ok(result_set)
+}
