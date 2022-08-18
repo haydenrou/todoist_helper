@@ -13,7 +13,7 @@ To build, run `cargo build --release`. The executable will live in `./target/rel
 
 ## Options
 - When adding a TODO, you can give the content (`-c`) flag to provide content
-  - `todoist_helper add todo -c "My new TODO"`\
+  - `todoist_helper add todo -c "My new TODO"`
 - When showing TODOs, you can add filters with the filters (`-f`) flag, and multiple separated by commas. See [Todoist's filter documentation](https://todoist.com/help/articles/introduction-to-filters)
   - `todoist_helper show todos -f "today"`
   - `todoist_helper show todos -f "today | overdue"`
