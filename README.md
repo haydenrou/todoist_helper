@@ -1,6 +1,10 @@
 # todoist_helper
 A simple CLI for adding, updating and viewing TODOs in Todoist
 
+## Prerequisites
+- Set an env variable for your Todoist API token (go to settings and integrations)
+  - `export TODOIST_TOKEN=1234567890`
+
 ## Usage
 To build, run `cargo build --release`. The executable will live in `./target/release/todoist_helper` - you can move this to somewhere your $PATH includes to run from anywhere
 - `todoist_helper add todo`
