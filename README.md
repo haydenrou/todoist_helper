@@ -18,9 +18,8 @@ When showing TODOs, you can specify the columns you'd like to see as a result wi
 
 ## Advanced Usage
 If you have [fzf](https://github.com/junegunn/fzf) installed, you can use the following to complete a TODO
-- ``
+- `cargo run -q -- show todos -a "id,content" | fzf | xargs -I{} cargo run -q -- complete todo {}`
 
 ## TODO: (I see the irony in this)
 - Add GET for projects
 - Add a way to set a date to a TODO that you're adding (see due_string)
-- Figure out how to pipe results into fzf then complete
