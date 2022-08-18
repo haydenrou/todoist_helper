@@ -92,6 +92,11 @@ pub async fn complete_todo(id: Option<u64>) -> Result<RequestResponse, reqwest::
         None => "".to_string()
     };
 
+    if parsed_id.is_empty() {
+        println!("not a valid ID");
+        unreachable!();
+    }
+
     let request_url = format!("{}", TASKS_URL.to_owned() + &(parsed_id) + &("/close"));
 
     let client = reqwest::Client::new();
