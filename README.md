@@ -22,7 +22,7 @@ To build, run `cargo build --release`. The executable will live in `./target/rel
 
 ## Advanced Usage
 If you have [fzf](https://github.com/junegunn/fzf) installed, you can use the following to complete a TODO
-- `cargo run -q -- show todos -a "id,content" | fzf | xargs -I{} cargo run -q -- complete todo {}`
+- `todoist_helper show todos -a "id,content" | fzf | xargs -I{} todoist_helper complete todo {}`
 
 ## TODO: (I see the irony in this)
 - Add a way to set a date to a TODO that you're adding (see due_string)
