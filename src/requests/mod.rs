@@ -22,7 +22,7 @@ pub fn add_todo(initial_values: PostTodo) -> Result<RequestResponse, reqwest::Er
     let data: PostTodo = PostTodo {
         content: if initial_values.content.is_empty() { get_user_input("content".to_string()) } else { initial_values.content },
         description: initial_values.description,
-
+        due_string: initial_values.due_string
     };
     let data_as_json = serde_json::to_string(&data).expect("No data");
 

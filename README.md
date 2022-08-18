@@ -14,9 +14,8 @@ To build, run `cargo build --release`. The executable will live in `./target/rel
 ## Options
 - When adding a TODO, you can give the content (`-c`) flag to provide content
   - `todoist_helper add todo -c "My new TODO"`
-- When showing TODOs, you can add filters with the filters (`-f`) flag, and multiple separated by commas. See [Todoist's filter documentation](https://todoist.com/help/articles/introduction-to-filters)
+- When showing TODOs, you can add filters with the filters (`-f`) flag, and multiple separated by commas. See [Todoist's filter documentation](https://todoist.com/help/articles/introduction-to-filters) *
   - `todoist_helper show todos -f "today"`
-  - `todoist_helper show todos -f "today | overdue"`
 - When showing TODOs, you can specify the columns you'd like to see as a result with the attribute(s) (`-a`) flag
   - `todoist_helper show todos -a "id,content"`
 
@@ -25,7 +24,7 @@ If you have [fzf](https://github.com/junegunn/fzf) installed, you can use the fo
 - `todoist_helper show todos -a "id,content" | fzf | xargs -I{} todoist_helper complete todo {}`
 
 ## TODO: (I see the irony in this)
-- Add a way to set a date to a TODO that you're adding (see due_string)
+- * multiple filters doesn't seem to work through the API i.e. (today | overdue). Need to investigate this
 
 ## Contributions
 You're more than welcome to submit an issue or PR with any bugs or feature suggestions.

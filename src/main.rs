@@ -32,26 +32,34 @@ pub struct Todo {
 #[derive(Serialize, Deserialize)]
 pub struct PostTodo {
     content: String,
-    description: String
+    description: String,
+    due_string: String
 }
 
 #[derive(Parser)]
-#[clap(author, version, about, long_about = None)]
+#[clap(author="Hayden Rouille", version="1.0", about="A way to interact with Todoist through a CLI", long_about = None)]
 struct Cli {
     action: String,
     target: String,
     item: Option<u64>,
 
-    #[clap(short = 'c', value_name = "CONTENT")]
+    /// The title of the TODO
+    #[clap(long, short = 'c', value_name = "CONTENT")]
     content: Option<String>,
 
-    #[clap(short = 'd', value_name = "DESCRIPTION")]
+    /// A string such as 'today' or '7th June'
+    #[clap(long, short = 'd', value_name = "DUE")]
+    due: Option<String>,
+
+    #[clap(long, value_name = "DESCRIPTION")]
     description: Option<String>,
 
-    #[clap(short = 'f', value_name = "FILTERS")]
+    /// Filters to specify which TODOs you want to see, i.e. "today"
+    #[clap(long, short = 'f', value_name = "FILTERS")]
     filters: Option<String>,
 
-    #[clap(short = 'a', value_name = "ATTRIBUTES")]
+    /// Attributes of the TODO you wish to view, i.e. "id,content"
+    #[clap(long, short = 'a', value_name = "ATTRIBUTES")]
     attributes: Option<String>,
 }
 
@@ -66,7 +74,11 @@ fn main() {
             description: match args.description {
                 Some(value) => { value.trim().to_string() },
                 None => "".to_string()
-            }
+            },
+            due_string: match args.due {
+                Some(value) => { value.trim().to_string() },
+                None => "".to_string()
+            },
         }),
         ["show", "todos"] => show_todos(
             match args.filters {
