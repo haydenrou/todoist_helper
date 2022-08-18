@@ -35,18 +35,6 @@ pub struct PostTodo {
     description: String
 }
 
-// #[derive(Serialize, Deserialize, Debug)]
-// struct Project {
-//     id: u32,
-//     name: String,
-//     comment_count: u32,
-//     color: u32,
-//     shared: bool,
-//     sync_id: u32,
-//     favorite: bool,
-//     url: String,
-// }
-
 #[derive(Parser)]
 #[clap(author, version, about, long_about = None)]
 struct Cli {

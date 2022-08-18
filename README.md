@@ -25,5 +25,8 @@ If you have [fzf](https://github.com/junegunn/fzf) installed, you can use the fo
 - `cargo run -q -- show todos -a "id,content" | fzf | xargs -I{} cargo run -q -- complete todo {}`
 
 ## TODO: (I see the irony in this)
-- Add GET for projects
 - Add a way to set a date to a TODO that you're adding (see due_string)
+
+## Contributions
+You're more than welcome to submit an issue or PR with any bugs or feature suggestions.
+
