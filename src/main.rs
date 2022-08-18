@@ -3,7 +3,6 @@ mod input;
 
 use crate::requests::{show_todos, add_todo, complete_todo};
 use requests::RequestResponse;
-use tokio::runtime::Runtime;
 use serde::{Deserialize, Serialize};
 use clap::Parser;
 
@@ -70,37 +69,33 @@ struct Cli {
 
 fn main() {
     let args = Cli::parse();
-    let rt  = Runtime::new().unwrap();
+    let arg_action: Result<RequestResponse, reqwest::Error> = match [&*args.action, &*args.target] {
+        ["add", "todo"] => add_todo(PostTodo {
+            content: match args.content {
+                Some(value) => { value.trim().to_string() },
+                None => "".to_string()
+            },
+            description: match args.description {
+                Some(value) => { value.trim().to_string() },
+                None => "".to_string()
+            }
+        }),
+        ["show", "todos"] => show_todos(
+            match args.filters {
+                Some(value) => { value.trim().to_string() },
+                None => "".to_string()
+            },
+            match args.attributes {
+                Some(ref values) => { values.split(",").map(|s|s.to_string()).collect() },
+                None => ["".to_string()].to_vec()
+            }
+        ),
+        ["complete", "todo"] => complete_todo(args.item),
+        _ => unreachable!()
+    };
 
-    rt.block_on(async {
-        let arg_action: Result<RequestResponse, reqwest::Error> = match [&*args.action, &*args.target] {
-            ["add", "todo"] => add_todo(PostTodo {
-                content: match args.content {
-                    Some(value) => { value.trim().to_string() },
-                    None => "".to_string()
-                },
-                description: match args.description {
-                    Some(value) => { value.trim().to_string() },
-                    None => "".to_string()
-                }
-            }).await,
-            ["show", "todos"] => show_todos(
-                match args.filters {
-                    Some(value) => { value.trim().to_string() },
-                    None => "".to_string()
-                },
-                match args.attributes {
-                    Some(ref values) => { values.split(",").map(|s|s.to_string()).collect() },
-                    None => ["".to_string()].to_vec()
-                }
-            ).await,
-            ["complete", "todo"] => complete_todo(args.item).await,
-            _ => unreachable!()
-        };
-
-        if arg_action.is_err() {
-            println!("Your task has had an error.")
-        };
-    });
+    if arg_action.is_err() {
+        println!("Your task has had an error.")
+    };
 }
 

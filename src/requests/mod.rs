@@ -6,17 +6,16 @@ use std::collections::HashMap;
 
 mod auth;
 
-
 pub enum RequestResponse {
     Single(Todo),
     Multiple(Vec<Todo>),
-    Empty(())
+    Empty(()),
 }
 
 // static PROJECTS_URL: &str = "https://api.todoist.com/rest/v1/projects";
 static TASKS_URL: &str = "https://api.todoist.com/rest/v1/tasks/";
 
-pub async fn add_todo(initial_values: PostTodo) -> Result<RequestResponse, reqwest::Error> {
+pub fn add_todo(initial_values: PostTodo) -> Result<RequestResponse, reqwest::Error> {
     let auth_key: &str = &("Bearer ".to_owned() + &auth::todoist_token().to_owned());
 
     let request_url = format!("{}", TASKS_URL);
@@ -27,32 +26,38 @@ pub async fn add_todo(initial_values: PostTodo) -> Result<RequestResponse, reqwe
     };
     let data_as_json = serde_json::to_string(&data).expect("No data");
 
-    let client = reqwest::Client::new();
+    let client = reqwest::blocking::Client::new();
     let response = client
         .post(&request_url)
         .header(AUTHORIZATION, auth_key)
         .header(CONTENT_TYPE, "application/json")
         .body(data_as_json)
-        .send()
-        .await?
-        .text()
-        .await?;
+        .send()?;
 
-    let result = serde_json::from_str::<Todo>(&response).expect("No Todo created");
+    let result = response.json::<Todo>();
 
-    println!("TODO created with the following details");
-    println!("ID: {}", result.id);
-    println!("Content: {}", result.content);
+    let todo = match result {
+        Ok(todo) => {
+            println!("TODO created with the following details");
+            println!("ID: {}", todo.id);
+            println!("Content: {}", todo.content);
+            todo
+        },
+        Err(e) => {
+            println!("{}", e);
+            unreachable!()
+        }
+    };
 
-    Ok(RequestResponse::Single(result))
+    Ok(RequestResponse::Single(todo))
 }
 
-pub async fn show_todos(filter_by: String, attributes_to_collect: Vec<String>) -> Result<RequestResponse, reqwest::Error> {
+pub fn show_todos(filter_by: String, attributes_to_collect: Vec<String>) -> Result<RequestResponse, reqwest::Error> {
     let auth_key: &str = &("Bearer ".to_owned() + &auth::todoist_token().to_owned());
 
     let request_url = format!("{}", TASKS_URL);
 
-    let client = reqwest::Client::new();
+    let client = reqwest::blocking::Client::new();
 
     let mut params = HashMap::new();
     params.insert("filter", filter_by);
@@ -61,31 +66,38 @@ pub async fn show_todos(filter_by: String, attributes_to_collect: Vec<String>) -
         .get(request_url)
         .query(&params)
         .header(AUTHORIZATION, auth_key)
-        .send()
-        .await?
-        .text()
-        .await?;
+        .send()?;
 
-    let result_set = serde_json::from_str::<Vec<Todo>>(&response).expect("No Todos found");
+    let result_set = response.json::<Vec<Todo>>();
 
-    for todo in &result_set {
-        if attributes_to_collect.is_empty() {
-            println!("{}", todo.content)
-        } else {
-            for attribute in &attributes_to_collect {
-                if attribute == "id" {
-                    println!("{}", todo.id)
-                } else if attribute == "content" {
+    let results = match result_set {
+        Ok(result) => {
+            for todo in &result {
+                if attributes_to_collect[0] == "" {
                     println!("{}", todo.content)
+                } else {
+                    for attribute in &attributes_to_collect {
+                        if attribute == "id" {
+                            println!("{:?}", todo.id)
+                        } else if attribute == "content" {
+                            println!("{:?}", todo.content)
+                        }
+                    }
                 }
             }
+
+            result
+        },
+        Err(e) => {
+            println!("{}", e);
+            unreachable!()
         }
     };
 
-    Ok(RequestResponse::Multiple(result_set))
+    Ok(RequestResponse::Multiple(results))
 }
 
-pub async fn complete_todo(id: Option<u64>) -> Result<RequestResponse, reqwest::Error> {
+pub fn complete_todo(id: Option<u64>) -> Result<RequestResponse, reqwest::Error> {
     let auth_key: &str = &("Bearer ".to_owned() + &auth::todoist_token().to_owned());
     let parsed_id = match id {
         Some(value) => { value.to_string() },
@@ -99,17 +111,19 @@ pub async fn complete_todo(id: Option<u64>) -> Result<RequestResponse, reqwest::
 
     let request_url = format!("{}", TASKS_URL.to_owned() + &(parsed_id) + &("/close"));
 
-    let client = reqwest::Client::new();
+    let client = reqwest::blocking::Client::new();
 
-    client
-        .post(request_url)
-        .header(AUTHORIZATION, auth_key)
-        .send()
-        .await?
-        .text()
-        .await?;
+    match client.post(request_url).header(AUTHORIZATION, auth_key).send() {
+        Ok(result) => {
+            println!("Your Todo has been successfully completed.");
+            result
+        },
+        Err(e) => {
+            println!("{}", e);
+            unreachable!()
+        }
+    };
 
-    println!("Your Todo has been successfully completed.");
 
     Ok(RequestResponse::Empty(()))
 }
